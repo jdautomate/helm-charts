@@ -87,9 +87,9 @@ spec:
 {{ toYaml .Values.server.env | indent 12}}
           {{- end }}
           args:
-          {{- if .Values.server.prefixURL }}
-            - --web.route-prefix={{ .Values.server.prefixURL }}
-          {{- end }}
+        {{- if .Values.server.defaultFlagsOverride }}
+        {{ toYaml .Values.server.defaultFlagsOverride | nindent 12}}
+        {{- else }}
           {{- if .Values.server.retention }}
             - --storage.tsdb.retention.time={{ .Values.server.retention }}
           {{- end }}
@@ -107,9 +107,13 @@ spec:
           {{- range $key, $value := .Values.server.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
+          {{- if .Values.server.prefixURL }}
+            - --web.route-prefix={{ .Values.server.prefixURL }}
+          {{- end }}
           {{- if .Values.server.baseURL }}
             - --web.external-url={{ .Values.server.baseURL }}
           {{- end }}
+        {{- end }}
           ports:
             - containerPort: 9090
           readinessProbe:
